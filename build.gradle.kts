@@ -3,4 +3,6 @@ plugins {
     // in each subproject's classloader
     alias(libs.plugins.jetbrainsCompose) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
+
+    kotlin("plugin.serialization") version "1.9.21" apply false
 }
