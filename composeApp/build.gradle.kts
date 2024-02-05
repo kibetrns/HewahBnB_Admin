@@ -19,10 +19,13 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
+
+            api(compose.materialIconsExtended)
+            api(compose.uiTooling)
 
             //PreCompose
             api(compose.foundation)
@@ -47,6 +50,7 @@ kotlin {
             //Kotlin datetime
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
+            
             //Coil
             implementation("io.coil-kt.coil3:coil-compose:3.0.0-alpha01")
 
@@ -54,9 +58,14 @@ kotlin {
             val koin_version = "3.5.0"
             implementation ("io.insert-koin:koin-core:$koin_version")
             implementation("io.insert-koin:koin-compose:1.1.0")
+
+            //Napier
+            val kertimVersion = "2.0.2"
+            implementation("co.touchlab:kermit:$kertimVersion")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+
         }
     }
 }
