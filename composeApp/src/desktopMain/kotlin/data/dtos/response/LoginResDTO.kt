@@ -4,23 +4,46 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginResDTO(
+data class LoginResDTOData(
     @SerialName("objectId")
     val objectId: String,
-    @SerialName("fullName")
-    val fullName: String,
-    @SerialName("mpesaNumber")
-    val mpesaNumber: Long,
-    @SerialName("email")
     val email: String,
-    @SerialName("username")
+    val fullName: String,
+    val mpesaNumber: Long,
     val username: String,
-    @SerialName("createdAt")
+    val userType: String,
     val createdAt: String,
-    @SerialName("updatedAt")
     val updatedAt: String,
-    @SerialName("ACL")
-    val acl: Map<String, Map<String, Boolean>>,  // ACL is a map with dynamic keys
-    @SerialName("sessionToken")
+    val roles: Roles,
+    val ACL: Map<String, AclPermissions>,
     val sessionToken: String
 )
+
+@Serializable
+data class Roles(
+    @SerialName("__type")
+    val type: String,
+    val className: String
+)
+
+@Serializable
+data class AclPermissions(
+    val read: Boolean,
+    val write: Boolean
+)
+
+
+@Serializable
+data class LoginResDTOError(
+    @SerialName("code") val code: Int,
+    @SerialName("error") val error: String
+)
+
+@Serializable
+sealed class LoginResDTO {
+    @Serializable
+    data class Success(val data: LoginResDTOData) : LoginResDTO()
+
+    @Serializable
+    data class Error(val data: LoginResDTOError) : LoginResDTO()
+}

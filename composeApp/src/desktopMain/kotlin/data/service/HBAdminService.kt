@@ -2,6 +2,7 @@ package data.service
 
 import data.dtos.response.LoginResDTO
 import data.dtos.response.SignUpResDTO
+import data.model.UserType
 
 interface HBAdminService {
 
@@ -10,8 +11,9 @@ interface HBAdminService {
         mpesaNumber: Long,
         email: String,
         password: String,
-        userName: String
-    ): SignUpResDTO?
+        userName: String,
+        userType: UserType
+    ): SignUpResDTO
 
     suspend fun login(userName: String, password: String): LoginResDTO?
 }

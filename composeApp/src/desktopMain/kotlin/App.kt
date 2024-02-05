@@ -17,6 +17,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.PreComposeApp
 import moe.tlaster.precompose.koin.koinViewModel
+import moe.tlaster.precompose.navigation.rememberNavigator
+import navigation.SetUpNavigation
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.KoinContext
@@ -25,47 +27,52 @@ import viewmodel.HBAdminViewModel
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun App() {
+
+
+
     PreComposeApp {
-
         KoinContext {
-            //    val createdUser =  rememberUpdatedState(hBAdminViewModel.createdUser.collectAsState().value)
-
+            val navigator = rememberNavigator()
             val scope = rememberCoroutineScope()
             val hBAdminViewModel = koinViewModel(HBAdminViewModel::class)
-
+            //    val createdUser =  rememberUpdatedState(hBAdminViewModel.createdUser.collectAsState().value)
             MaterialTheme {
-                var showContent by remember { mutableStateOf(false) }
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Button(onClick = {
-                        showContent = !showContent
-
-                        scope.launch {
-                            val signUpResult = async {
-                                hBAdminViewModel.loginUser()
-                            }
-
-                            signUpResult.await()
-                        }
-
-                    }) {
-                        Text("Click me!")
-                    }
-                    AnimatedVisibility(showContent) {
-                        Column(
-                            Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Image(painterResource("compose-multiplatform.xml"), null)
-                            Text("Compose: $greeting")
-                        }
-                    }
-                }
+                SetUpNavigation(
+                    navController = navigator,
+                    hBAdminViewModel = hBAdminViewModel
+                )
+//
+//                var showContent by remember { mutableStateOf(false) }
+//                val greeting = remember { Greeting().greet() }
+//                Column(
+//                    Modifier.fillMaxWidth(),
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    Button(onClick = {
+//                        showContent = !showContent
+//
+//                        scope.launch {
+//                            val signUpResult = async {
+//                                hBAdminViewModel.loginUser()
+//                            }
+//
+//                            signUpResult.await()
+//                        }
+//
+//                    }) {
+//                        Text("Click me!")
+//                    }
+//                    AnimatedVisibility(showContent) {
+//                        Column(
+//                            Modifier.fillMaxWidth(),
+//                            horizontalAlignment = Alignment.CenterHorizontally
+//                        ) {
+//                            Image(painterResource("compose-multiplatform.xml"), null)
+//                            Text("Compose: $greeting")
+//                        }
+//                    }
+//                }
             }
         }
-
     }
 }

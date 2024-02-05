@@ -1,5 +1,6 @@
 package data.dtos.request
 
+import data.model.UserType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -14,5 +15,9 @@ data class SignUpReqDTO(
     @SerialName("password")
     val password: String,
     @SerialName("username")
-    val userName: String
+    val userName: String,
+    @SerialName("userType")
+    val userType: UserType,
 )
+
+

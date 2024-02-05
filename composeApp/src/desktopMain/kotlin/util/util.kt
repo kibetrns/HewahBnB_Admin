@@ -15,7 +15,10 @@ const val HOME_SCREEN = "home"
 
 const val APP_ID = "myAppId"
 const val MASTER_KEY = "main-key-1-!"
-const val BASE_SERVER_URL = "  https://hewabnb-server.onrender.com/parse"
+//const val BASE_SERVER_URL = "https://hewabnb-server.onrender.com/parse"
+
+const val BASE_SERVER_URL = "http://localhost:1337/parse"
+
 
 sealed class HBAPIEndpoints(val url: String) {
 
@@ -47,3 +50,12 @@ enum class TrailingIconState {
 val TOP_APP_BAR_HEIGHT = 56.dp
 
 val TONAL_ELEVATION = 8.dp
+
+fun isPasswordValid(password: String, confirmedPassword: String): Boolean {
+    return password.length >= 8 && password == confirmedPassword
+}
+
+fun isEmailValid(email: String): Boolean {
+    val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
+    return email.trim().matches(emailRegex.toRegex())
+}

@@ -1,6 +1,6 @@
 package data.model
 
 enum class FurnishType {
-    FULLYFURNISHED,
+    FULLY_FURNISHED,
     UNFURNISHED
 }

@@ -1,10 +1,12 @@
 package viewmodel
 
 
+import co.touchlab.kermit.Logger
 import data.dtos.request.LoginReqDTO
 import data.dtos.request.SignUpReqDTO
 import data.dtos.response.LoginResDTO
 import data.dtos.response.SignUpResDTO
+import data.model.UserType
 import data.repository.HBAdminRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -12,15 +14,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import org.slf4j.LoggerFactory
 import util.Result
 
 class HBAdminViewModel(
     private val repository: HBAdminRepository
 ): ViewModel() {
-
-    val log = LoggerFactory.getLogger(HBAdminViewModel::class.java)
-
 
     var passwordVisible = MutableStateFlow(false)
     var isLoading = MutableStateFlow(false)
@@ -31,58 +29,112 @@ class HBAdminViewModel(
     val fullName = MutableStateFlow("")
     val mpesaNumber = MutableStateFlow(254711223344)
     val confirmedPassword = MutableStateFlow("")
+    val userType = MutableStateFlow(UserType.ADMINISTRATOR)
 
     val errorMessage = MutableStateFlow("")
 
 
     val isUserCreated = MutableStateFlow(false)
+    val isUserLoggedIn = MutableStateFlow(false)
 
 
     private val _createdUser = MutableStateFlow<Result<SignUpResDTO>>(Result.Idle)
     val createdUser: StateFlow<Result<SignUpResDTO>> = _createdUser
 
+
     private val _loggedInUser = MutableStateFlow<Result<LoginResDTO>>(Result.Idle)
     val loggedInUser: StateFlow<Result<LoginResDTO>> = _loggedInUser
+
 
 
     suspend fun signUpUser() {
         _createdUser.value = Result.Loading
         isUserCreated.value = false
-
         try {
             val createdUser = viewModelScope.async(Dispatchers.IO) {
-                log.debug("SIGNUP_VM", SignUpReqDTO(
-                    email = email.value,
-                    fullName = fullName.value,
-                    mpesaNumber = mpesaNumber.value,
-                    password = password.value,
-                    userName = email.value
-                ).toString())
+
+                Logger.d(
+                    tag = "SIGNUP_VM",
+                    messageString = (
+                            SignUpReqDTO(
+                                email = email.value,
+                                fullName = fullName.value,
+                                mpesaNumber = mpesaNumber.value,
+                                password = password.value,
+                                userName = email.value,
+                                userType = userType.value
+                            ).toString())
+                )
 
                 repository.signUp(
                     fullName = fullName.value,
                     mpesaNumber = mpesaNumber.value,
                     email = email.value,
                     password = password.value,
-                    userName = email.value
+                    userName = email.value,
+                    userType = userType.value
                 )
             }.await()
 
-            if (createdUser != null) {
-                _createdUser.value = Result.Success(data = createdUser)
-                isUserCreated.value = true
+            when(createdUser) {
+                is SignUpResDTO.Error -> {
 
-                log.debug("SIGNUP_VM", _createdUser.value.toString())
-            } else {
-                Result.Error(message = "Something went wrong. User not created")
-                errorMessage.value = "Something went wrong. User not created"
+                    _createdUser.value = Result.Error(
+                        message = createdUser.data.error,
+                        statusCode = createdUser.data.code
+                    )
 
-                log.debug("SIGNUP_VM", _createdUser.value.toString())
+                    Logger.d(
+                        tag = "SIGNUP_VM",
+                        messageString = (
+                                SignUpReqDTO(
+                                    email = email.value,
+                                    fullName = fullName.value,
+                                    mpesaNumber = mpesaNumber.value,
+                                    password = password.value,
+                                    userName = email.value,
+                                    userType = userType.value
+                                ).toString())
+                    )
+                }
+
+                is SignUpResDTO.Success -> {
+                    _createdUser.value = Result.Success( data = createdUser)
+
+                    isUserCreated.value = true
+
+                    Logger.d(
+                        tag = "SIGNUP_VM",
+                        messageString = (
+                                SignUpReqDTO(
+                                    email = email.value,
+                                    fullName = fullName.value,
+                                    mpesaNumber = mpesaNumber.value,
+                                    password = password.value,
+                                    userName = email.value,
+                                    userType = userType.value
+                                ).toString())
+                    )
+
+                    Logger.d(
+                        tag = "SIGNUP_VM",
+                        messageString = (_createdUser.value.toString())
+                    )
+                }
             }
-        } catch (e: Exception) {
-            // Handle exceptions if any
-            log.debug("SIGNUP_VM", "Exception: ${e.message}")
-            errorMessage.value = "Something went wrong. User not created: ${e.message}"
+
+        } catch (e: Throwable) {
+
+            _createdUser.value = Result.Error(
+                message = e.message,
+            )
+
+            Logger.e(
+                tag = "SIGNUP_VM",
+                messageString = ("Exception: ${e.message}")
+            )
+
+            errorMessage.value = "User not created: ${e.message}"
         }
     }
 
@@ -90,10 +142,16 @@ class HBAdminViewModel(
     suspend fun loginUser() {
         try {
             val loggedInUser = viewModelScope.async(Dispatchers.IO) {
-                log.debug("LOGIN_VM", LoginReqDTO(
-                    password = password.value,
-                    userName = email.value
-                ).toString())
+
+
+                Logger.d(
+                    tag = "LOGIN_VM",
+                    messageString = (
+                            LoginReqDTO(
+                                password = password.value,
+                                userName = email.value
+                            ).toString())
+                )
 
                 repository.login(
                     userName = email.value,
@@ -101,20 +159,62 @@ class HBAdminViewModel(
                 )
             }.await()
 
-            if (loggedInUser != null) {
-                _loggedInUser.value = Result.Success(data = loggedInUser)
 
-                log.debug("LOGIN_VM", _loggedInUser.value.toString())
-            } else {
-                Result.Error(message = "Something went wrong. Unable to Login")
-                errorMessage.value = "Something went wrong. Unable to Login"
 
-                log.debug("LOGIN_VM", _loggedInUser.value.toString())
+            when(loggedInUser) {
+                is  LoginResDTO.Error -> {
+
+                    _loggedInUser.value = Result.Error(
+                        message = loggedInUser.data.error,
+                        statusCode = loggedInUser.data.code
+                    )
+
+                    Logger.d(
+                        tag = "LOGIN_VM_ERROR",
+                        messageString = ( loggedInUser.data.toString() )
+                    )
+
+                }
+
+                is LoginResDTO.Success -> {
+
+                    Logger.d(
+                        tag = "LOGIN_VM",
+                        messageString = (
+                                LoginReqDTO(
+                                    password = password.value,
+                                    userName = email.value,
+                                ).toString())
+                    )
+
+                    Logger.d(
+                        tag = "LOGIN_VM_SUCCESS",
+                        messageString = (_loggedInUser.value.toString())
+                    )
+
+
+
+                    _loggedInUser.value = Result.Success(data = loggedInUser)
+
+                    isUserLoggedIn.value = true
+
+                }
+
+                else -> {}
             }
-        } catch (e: Exception) {
-            // Handle exceptions if any
-            log.debug("LOGIN_VM", "Exception: ${e.message}")
-            errorMessage.value = "Something went wrong. Unable to Login: ${e.message}"
+        } catch (e: Throwable) {
+
+            Logger.d(
+                tag = "LOGIN_VM_EXCEPTION",
+                messageString = (e.message.toString())
+            )
+
+            Logger.d(
+                tag = "LOGIN_VM_EXCEPTION",
+                messageString = (e.stackTraceToString())
+            )
+
+            errorMessage.value = "Unable to Login: ${e.message}"
         }
     }
 }
