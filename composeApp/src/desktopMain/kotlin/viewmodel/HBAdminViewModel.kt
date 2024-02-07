@@ -203,6 +203,9 @@ class HBAdminViewModel(
                 else -> {}
             }
         } catch (e: Throwable) {
+            _loggedInUser.value = Result.Error(
+                message = e.message
+            )
 
             Logger.d(
                 tag = "LOGIN_VM_EXCEPTION",
