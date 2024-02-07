@@ -203,7 +203,7 @@ fun SignUpScreen(
 
                         if ((createdUser as Result.Error).statusCode == null) {
                             Text(
-                                text = "Error: ${(createdUser as Result.Error).message}"
+                                text = "${(createdUser as Result.Error).message}"
                             )
                         } else {
                             Text(
@@ -222,7 +222,7 @@ fun SignUpScreen(
                     text = {
                         MessageCont(
                             messageType = MessageType.Error,
-                            message = "Failed: ${hBAdminViewModel.errorMessage.value}"
+                            message = hBAdminViewModel.errorMessage.value
                         )
                     })
             }

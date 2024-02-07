@@ -1,8 +1,6 @@
 package navigation.graphs
 
-import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
-import moe.tlaster.precompose.navigation.PopUpTo
 import moe.tlaster.precompose.navigation.RouteBuilder
 import view.LoginScreen
 import view.SignUpScreen
@@ -22,7 +20,7 @@ fun RouteBuilder.authNavGraph(
                 hBAdminViewModel = hBAdminViewModel,
                 navigateToHomeScreen = {
                     navController.navigate(
-                        route = HomeScreen.Home.route
+                        route = HomeScreen.Dashboard.route
                     )
                 },
                 navigateToLoginScreen = {
@@ -46,7 +44,7 @@ fun RouteBuilder.authNavGraph(
                 navigateToHomeScreen = {
                     //navController.popBackStack()
                     navController.navigate(
-                        route = HomeScreen.Home.route,
+                        route = HomeScreen.Dashboard.route,
                         /*
                         options = NavOptions(
                             launchSingleTop = true

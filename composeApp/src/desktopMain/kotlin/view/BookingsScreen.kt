@@ -6,12 +6,10 @@ import moe.tlaster.precompose.navigation.Navigator
 import viewmodel.HBAdminViewModel
 
 @Composable
-fun HomeScreen(
+fun BookingsScreen(
     navController: Navigator,
-    hBAdminViewModel: HBAdminViewModel
+    hBAdminViewModel: HBAdminViewModel,
 ) {
-
-    Text(text = "HOME SCREEN COMING SOON")
-
+    Text(text = "Bookings Screen")
 
 }
